@@ -99,7 +99,7 @@ for col in num_cols:
 # -----------------------------
 # 10. Loại bỏ các cột không cần
 # -----------------------------
-remove_cols = ["sample_no"]  # hoặc thêm nếu muốn
+remove_cols = ["sample_no","water_control_zone", "station", "dates","depth","station_depth"]  # hoặc thêm nếu muốn
 df = df.drop(columns=[c for c in remove_cols if c in df.columns])
 
 # -----------------------------

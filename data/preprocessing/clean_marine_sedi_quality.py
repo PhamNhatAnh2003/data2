@@ -98,7 +98,7 @@ for col in num_cols:
 # -----------------------------
 # 10. Loại bỏ các cột không cần
 # -----------------------------
-remove_cols = [
+remove_cols = ["water_control_zone", "station", "dates",
     "sample_no", "type", "particle_size_fraction_<63_micrometer_pctw_w", "dry_wet_ratio"
 ]
 df = df.drop(columns=[c for c in remove_cols if c in df.columns])
