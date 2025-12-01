@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 
 # Load dữ liệu nước đã clean
-df = pd.read_csv(r"..\data\preprocessing\cleaned\marine_water_quality_clean.csv")
+df = pd.read_csv(r"..\..\data\preprocessing\cleaned\marine_water_quality_clean.csv")
 
 # Chuyển các cột số về numeric
 num_cols = [
