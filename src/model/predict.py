@@ -6,8 +6,8 @@ import joblib
 # 1. PATH
 # ========================================
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-DATA_PATH = os.path.join(BASE_DIR, "..", "data", "new_water_data.csv")  # dữ liệu mới
-MODEL_DIR = os.path.join(BASE_DIR, "..", "models")
+DATA_PATH = os.path.join(BASE_DIR, "..","..", "data", "data_1.csv")  # dữ liệu mới
+MODEL_DIR = os.path.join(BASE_DIR,"..", "..", "models")
 
 # ========================================
 # 2. LOAD DATA
@@ -82,10 +82,32 @@ predictions = {
 }
 
 # ========================================
-# 6. IN KẾT QUẢ RA TERMINAL
+# ========================================
+# 6. IN KẾT QUẢ RA TERMINAL VỚI NHẬN XÉT
 # ========================================
 for i in range(len(df_new)):
+    rf_cagio = predictions['rf_cagio'][i]
+    xgb_cagio = predictions['xgb_cagio'][i]
+    rf_hau = predictions['rf_hau'][i]
+    xgb_hau = predictions['xgb_hau'][i]
+
+    # Xác định mức độ phù hợp dựa trên số lượng nhãn risk (2) / warning (1)
+    def assess_level(rf_pred, xgb_pred):
+        risk_count = sum([rf_pred == 2, xgb_pred == 2])
+        warning_count = sum([rf_pred == 1, xgb_pred == 1])
+
+        if risk_count >= 1:
+            return "Low", "Không phù hợp, nguy cơ cao"
+        elif warning_count >= 1:
+            return "Medium", "Cẩn thận, mức độ phù hợp trung bình"
+        else:
+            return "High", "Phù hợp, an toàn"
+
+    level_cagio, comment_cagio = assess_level(rf_cagio, xgb_cagio)
+    level_hau, comment_hau = assess_level(rf_hau, xgb_hau)
+
     print(f"Mẫu {i+1}:")
-    print(f"  Cá Giò - RF: {predictions['rf_cagio'][i]}, XGB: {predictions['xgb_cagio'][i]}")
-    print(f"  Hàu   - RF: {predictions['rf_hau'][i]}, XGB: {predictions['xgb_hau'][i]}")
-    print("-"*40)
+    print(f"  Cá Giò - RF: {rf_cagio}, XGB: {xgb_cagio} | Mức độ: {level_cagio} | Nhận xét: {comment_cagio}")
+    print(f"  Hàu   - RF: {rf_hau}, XGB: {xgb_hau} | Mức độ: {level_hau} | Nhận xét: {comment_hau}")
+    print("-"*60)
+
