@@ -1,9 +1,21 @@
 import os
 import joblib
+import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.metrics import (
+    classification_report,
+    confusion_matrix,
+    accuracy_score,
+    balanced_accuracy_score,
+    cohen_kappa_score,
+    matthews_corrcoef,
+    roc_auc_score,
+    mean_absolute_error
+)
+from sklearn.preprocessing import label_binarize
+
 
 def train_save_rf(X, y, model_name, model_dir):
     """
@@ -27,11 +39,45 @@ def train_save_rf(X, y, model_name, model_dir):
     )
     clf.fit(X_train_scaled, y_train)
 
-    # Đánh giá
+    # Dự đoán
     y_pred = clf.predict(X_test_scaled)
+    y_pred_prob = clf.predict_proba(X_test_scaled)  # dùng cho AUC
+
     print(f"\n===== {model_name} (Random Forest) =====")
+    print("\n=== Confusion Matrix ===")
     print(confusion_matrix(y_test, y_pred))
+
+    print("\n=== Classification Report ===")
     print(classification_report(y_test, y_pred))
+
+    # ======= METRIC BỔ SUNG ========
+    acc = accuracy_score(y_test, y_pred)
+    bal_acc = balanced_accuracy_score(y_test, y_pred)
+    kappa = cohen_kappa_score(y_test, y_pred)
+    mcc = matthews_corrcoef(y_test, y_pred)
+    mae = mean_absolute_error(y_test, y_pred)
+
+    # ROC-AUC (đa lớp)
+    classes = np.unique(y)
+    try:
+        y_test_binarized = label_binarize(y_test, classes=classes)
+        roc_auc = roc_auc_score(
+            y_test_binarized,
+            y_pred_prob,
+            multi_class="ovr"
+        )
+    except Exception:
+        roc_auc = "Không tính được (có thể tập test chỉ có 1 lớp)"
+
+    print("\n=== Metrics nâng cao ===")
+    print(f"Accuracy: {acc:.4f}")
+    print(f"Balanced Accuracy: {bal_acc:.4f}")
+    print(f"Cohen Kappa: {kappa:.4f}")
+    print(f"MCC: {mcc:.4f}")
+    print(f"MAE (phân loại): {mae:.4f}")
+    print(f"ROC-AUC (multi-class OVR): {roc_auc}")
+
+    print("\n--------------------------\n")
 
     # Lưu model và scaler
     os.makedirs(model_dir, exist_ok=True)
